@@ -3,7 +3,7 @@ package io.bootify.l11_visitor_management.rest;
 import io.bootify.l11_visitor_management.model.RoleDTO;
 import io.bootify.l11_visitor_management.service.RoleService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

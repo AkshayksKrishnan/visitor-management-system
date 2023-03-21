@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
+        <version>2.7.0</version>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
         <relativePath /><!-- lookup parent from repository -->
     </parent>
     <groupId>io.bootify</groupId>
@@ -14,7 +14,7 @@
     <name>l11-visitor-management</name>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
@@ -37,14 +37,35 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.0.0</version>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.6.8</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+<!--                <dependency>-->
+<!--                    <groupId>org.springframework.session</groupId>-->
+<!--                    <artifactId>spring-session-data-redis</artifactId>-->
+<!--                </dependency>-->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -56,12 +77,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.8</version>
-        </dependency>
-
     </dependencies>
 
     <build>

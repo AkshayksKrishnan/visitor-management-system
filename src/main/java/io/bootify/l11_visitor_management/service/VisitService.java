@@ -13,11 +13,13 @@ import io.bootify.l11_visitor_management.repos.VisitorRepository;
 import io.bootify.l11_visitor_management.util.NotFoundException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,11 @@ public class VisitService {
 
     @Autowired
     private  UserRepository userRepository;
+
+    @Autowired
+    private RedisTemplate<String,Object> redisTemplate;
+
+    private String pending_visits_prefix="pending_visits_";
 
     private final VisitRepository visitRepository;
     private final VisitorRepository visitorRepository;
@@ -94,11 +101,12 @@ public class VisitService {
         Visit visit = visitRepository.findById(visitID).get();
         Flat flat = visit.getFlat();
         User user = userRepository.findById(userID).get();
-
         if(user.getFlat()==flat && visit.getStatus().equals(VisitStatus.PENDING)){
             visit.setStatus(VisitStatus.APPROVED);
             visit.setInTime(LocalDateTime.now());
             visitRepository.save(visit);
+            String key = pending_visits_prefix+flat.getId();
+            redisTemplate.delete(key);
         }
         else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Status not updated");
@@ -108,10 +116,16 @@ public class VisitService {
     public List<VisitDTO> getPendingVisitsByUser(Long userID) {
         User user = userRepository.findById(userID).get();
         Flat userFlat = user.getFlat();
-        return  visitRepository.findByFlatAndStatus(userFlat,VisitStatus.PENDING)
-                .stream()
-                .map(visit -> mapToDTO(visit, new VisitDTO()))
-                .collect(Collectors.toList());
+        String key = pending_visits_prefix+userFlat.getId();
+        List<VisitDTO> visitDTOList = (List<VisitDTO>) redisTemplate.opsForValue().get(key);
+        if (visitDTOList == null){
+            visitDTOList = visitRepository.findByFlatAndStatus(userFlat,VisitStatus.PENDING)
+                    .stream()
+                    .map(visit -> mapToDTO(visit, new VisitDTO()))
+                    .collect(Collectors.toList());
+            redisTemplate.opsForValue().set(key,visitDTOList);
+        }
+        return  visitDTOList;
     }
 
     public void rejectVisit(Long visitID, Long userID) {

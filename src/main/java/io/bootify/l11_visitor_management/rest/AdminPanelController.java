@@ -3,7 +3,6 @@ package io.bootify.l11_visitor_management.rest;
 import io.bootify.l11_visitor_management.model.UserDTO;
 import io.bootify.l11_visitor_management.service.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -15,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin-panel")
@@ -34,13 +35,18 @@ public class AdminPanelController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/create-user")
+    @PostMapping("/create/user")
     @ApiResponse(responseCode = "201")
     public ResponseEntity<Long> createUser(@RequestBody @Valid final UserDTO userDTO) {
         return new ResponseEntity<>(userService.create(userDTO), HttpStatus.CREATED);
     }
 
-    @PostMapping("/user-csv/upload")
+    @GetMapping("/getAll/users")
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
+        return ResponseEntity.ok(userService.findAll());
+    }
+
+    @PostMapping("/userUpload/csv")
     public ResponseEntity<String> uploadUserCSV(@RequestParam("file") MultipartFile file){
         String message="";
         try{
@@ -66,5 +72,18 @@ public class AdminPanelController {
             message = "Could not upload the file: " + file.getOriginalFilename() + "!";
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(message);
         }
+    }
+
+    @PutMapping("update/user/{id}")
+    public ResponseEntity<Void> updateUser(@PathVariable final Long id, @RequestBody @Valid final UserDTO userDTO) {
+        userService.update(id, userDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("delete/user/{id}")
+    @ApiResponse(responseCode = "204")
+    public ResponseEntity<Void> deleteUser(@PathVariable final Long id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -12,7 +12,10 @@ import io.bootify.l11_visitor_management.repos.UserRepository;
 import io.bootify.l11_visitor_management.util.NotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -23,6 +26,9 @@ public class UserService {
     private final FlatRepository flatRepository;
     private final AddressRepository addressRepository;
     private final RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserService(final UserRepository userRepository, final FlatRepository flatRepository,
             final AddressRepository addressRepository, final RoleRepository roleRepository) {
@@ -48,6 +54,7 @@ public class UserService {
     public Long create(final UserDTO userDTO) {
         final User user = new User();
         mapToEntity(userDTO, user);
+        user.setPassword(passwordEncoder.encode("123"));
         return userRepository.save(user).getId();
     }
 
